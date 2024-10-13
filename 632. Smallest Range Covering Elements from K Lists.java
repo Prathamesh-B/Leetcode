@@ -1,48 +1,22 @@
 class Solution {
-    public int[] smallestRange(int[][] nums) {
-        PriorityQueue<Element> pq = new PriorityQueue<Element>(new Comparator<Element>() {
-            public int compare(Element a, Element b) {
-                return a.val - b.val;
-            }
-        });
-        int min = Integer.MAX_VALUE, max = Integer.MIN_VALUE;
-        for (int i = 0; i < nums.length; i++) {
-            Element e = new Element(i, 0, nums[i][0]);
-            pq.offer(e);
-            max = Math.max(max, nums[i][0]);
+    public int[] smallestRange(List<List<Integer>> a) {
+        PriorityQueue<int[]> q = new PriorityQueue<>(Comparator.comparingInt(o -> a.get(o[0]).get(o[1])));
+        int max = Integer.MIN_VALUE, start = 0, end = Integer.MAX_VALUE;
+        for (int i = 0; i < a.size(); i++) {
+            q.offer(new int[] { i, 0 });
+            max = Math.max(max, a.get(i).get(0));
         }
-        int range = Integer.MAX_VALUE;
-        int start = -1, end = -1;
-        while (pq.size() == nums.length) {
-
-            Element curr = pq.poll();
-            if (max - curr.val < range) {
-                range = max - curr.val;
-                start = curr.val;
+        while (q.size() == a.size()) {
+            int e[] = q.poll(), row = e[0], col = e[1];
+            if (end - start > max - a.get(row).get(col)) {
+                start = a.get(row).get(col);
                 end = max;
             }
-            if (curr.idx + 1 < nums[curr.row].length) {
-                curr.idx = curr.idx + 1;
-                curr.val = nums[curr.row][curr.idx];
-                pq.offer(curr);
-                if (curr.val > max) {
-                    max = curr.val;
-                }
+            if (col + 1 < a.get(row).size()) {
+                q.offer(new int[] { row, col + 1 });
+                max = Math.max(max, a.get(row).get(col + 1));
             }
         }
-
         return new int[] { start, end };
-    }
-
-    class Element {
-        int val;
-        int idx;
-        int row;
-
-        public Element(int r, int i, int v) {
-            val = v;
-            idx = i;
-            row = r;
-        }
     }
 }
